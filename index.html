@@ -164,11 +164,10 @@ function clearSig(){
 if(window.signaturePad) window.signaturePad.clear();
 }
 
-/* ===================== DOWNLOAD ===================== */
+
 async function download(name){
 
 let code = prompt("Entrez le code VIP pour télécharger :");
-
 if(code !== VIP_CODE){
 alert("Code incorrect ❌");
 return;
@@ -176,12 +175,11 @@ return;
 
 const app = document.getElementById("app");
 
-/* 🔥 FORCER AFFICHAGE COMPLET AVANT CAPTURE */
+/* 🔥 FORCER AFFICHAGE COMPLET */
 app.style.height = "auto";
 app.style.overflow = "visible";
 
-/* attendre rendu complet */
-await new Promise(r => setTimeout(r, 300));
+await new Promise(r => setTimeout(r, 500));
 
 const canvas = await html2canvas(app,{
 scale:2,
@@ -192,21 +190,37 @@ windowWidth: app.scrollWidth,
 windowHeight: app.scrollHeight
 });
 
+const imgData = canvas.toDataURL("image/png");
+
 const { jsPDF } = window.jspdf;
 
+/* 🔥 MODE A6 + MULTIPAGES */
 const pdf = new jsPDF("p","mm","a6");
-
-const img = canvas.toDataURL("image/png");
 
 const pdfWidth = pdf.internal.pageSize.getWidth();
 const pdfHeight = pdf.internal.pageSize.getHeight();
 
-/* 🔥 IMPORTANT : adapter image */
-pdf.addImage(img,"PNG",0,0,pdfWidth,pdfHeight);
+/* calcul hauteur image */
+const imgProps = pdf.getImageProperties(imgData);
+const imgHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+let heightLeft = imgHeight;
+let position = 0;
+
+/* première page */
+pdf.addImage(imgData,"PNG",0,position,pdfWidth,imgHeight);
+heightLeft -= pdfHeight;
+
+/* 🔥 MULTIPAGE AUTOMATIQUE */
+while(heightLeft > 0){
+position = heightLeft - imgHeight;
+pdf.addPage();
+pdf.addImage(imgData,"PNG",0,position,pdfWidth,imgHeight);
+heightLeft -= pdfHeight;
+}
 
 pdf.save(name+".pdf");
 }
-
 </script>
 
 <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
