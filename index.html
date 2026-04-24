@@ -165,7 +165,6 @@ if(window.signaturePad) window.signaturePad.clear();
 }
 
 /* ===================== DOWNLOAD ===================== */
-
 async function download(name){
 
 let code = prompt("Entrez le code VIP pour télécharger :");
@@ -177,12 +176,34 @@ return;
 
 const app = document.getElementById("app");
 
-const canvas = await html2canvas(app,{scale:2});
+/* 🔥 FORCER AFFICHAGE COMPLET AVANT CAPTURE */
+app.style.height = "auto";
+app.style.overflow = "visible";
+
+/* attendre rendu complet */
+await new Promise(r => setTimeout(r, 300));
+
+const canvas = await html2canvas(app,{
+scale:2,
+useCORS:true,
+scrollX:0,
+scrollY:0,
+windowWidth: app.scrollWidth,
+windowHeight: app.scrollHeight
+});
+
 const { jsPDF } = window.jspdf;
 
 const pdf = new jsPDF("p","mm","a6");
 
-pdf.addImage(canvas.toDataURL("image/png"),"PNG",0,0,105,148);
+const img = canvas.toDataURL("image/png");
+
+const pdfWidth = pdf.internal.pageSize.getWidth();
+const pdfHeight = pdf.internal.pageSize.getHeight();
+
+/* 🔥 IMPORTANT : adapter image */
+pdf.addImage(img,"PNG",0,0,pdfWidth,pdfHeight);
+
 pdf.save(name+".pdf");
 }
 
