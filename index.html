@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Mini Secrétariat Complet</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet"/>
+
+<style>
+:root{--bg1:#ffefd5;--bg2:#ffe4f0;--accent:#ff6b6b;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:Inter,sans-serif;background:linear-gradient(120deg,var(--bg1),var(--bg2));color:#222;overflow-x:hidden;}
+
+.header{display:flex;align-items:center;justify-content:space-between;padding:12px 18px;background:rgba(255,255,255,0.6);backdrop-filter:blur(6px);box-shadow:0 6px 18px rgba(0,0,0,0.06);position:sticky;top:0;z-index:10;}
+
+.brand{display:flex;align-items:center;gap:12px;}
+.brand .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(45deg,#ff9a9e,#fad0c4);display:flex;align-items:center;justify-content:center;font-size:28px;}
+.brand h1{font-family:Dancing Script,cursive;margin:0;font-size:20px;color:var(--accent);}
+
+.container{padding:8px;display:flex;justify-content:center;flex-direction:column;align-items:center;}
+
+.main{background:rgba(255,255,255,0.9);padding:8mm;border-radius:12px;width:95%;max-width:600px;min-height:105mm;overflow-y:auto;}
+
+.doc-title{font-family:Dancing Script,cursive;font-size:18px;margin:6px 0;}
+.handwritten{font-family:'Dancing Script',cursive;font-weight:700;font-size:16px;color:#2c3e50;}
+
+.doc-photo{
+width:60px;height:60px;object-fit:cover;border-radius:50%;
+border:2px solid white;box-shadow:0 4px 12px rgba(0,0,0,0.08);
+cursor:pointer;margin:4px;float:left;background:#eee;
+}
+
+.btn{padding:6px 10px;border-radius:8px;border:0;cursor:pointer;margin-top:4px;font-size:12px;}
+.btn-primary{background:linear-gradient(90deg,#4facfe,#00f2fe);color:white;}
+.btn-ghost{background:transparent;border:1px solid #ddd;margin-left:6px;font-size:12px;}
+
+.signature-pad{border:1px solid #ccc;border-radius:8px;width:100%;height:50px;background:#fff;margin-top:8px;}
+
+.photo-flottante{float:left;margin:4px;padding:4px;border:1px solid #aaa;border-radius:6px;background:#fff;max-width:200px;}
+.photo-flottante img{max-width:100%;display:block;margin-bottom:4px;}
+
+.fiche70{display:flex; flex-wrap:wrap; gap:12px;}
+.colonne{flex:1; min-width:45%;}
+
+/* menu */
+.hamburger { width: 35px; cursor: pointer; display:flex; flex-direction:column; gap:6px; margin:15px; z-index:1001; position:relative;}
+.hamburger div { height:4px; background:#000; border-radius:3px; transition:.3s;}
+
+.side-menu {
+position:fixed; top:0; right:-250px; width:250px; height:100%;
+background:#fff; padding-top:80px;
+display:flex; flex-direction:column; gap:15px;
+transition:.4s; box-shadow:-4px 0 10px rgba(0,0,0,0.1);
+z-index:1000; overflow-y:auto;
+}
+
+.side-menu a{font-size:16px;padding:8px 16px;color:#000;text-decoration:none;}
+.side-menu.open{right:0;}
+
+.hamburger.active div:nth-child(1){transform:translateY(10px) rotate(45deg);}
+.hamburger.active div:nth-child(2){opacity:0;}
+.hamburger.active div:nth-child(3){transform:translateY(-10px) rotate(-45deg);}
+</style>
+</head>
+
+<body>
+
+<header class="header">
+  <div class="brand">
+    <div class="logo">LF</div>
+    <h1>Mini Secrétariat</h1>
+  </div>
+
+  <div class="hamburger" id="hamburger">
+    <div></div><div></div><div></div>
+  </div>
+</header>
+
+<div class="side-menu" id="sideMenu">
+  <a href="#" onclick="ouvrirDoc('CV'); closeMenu(); return false;">CV</a>
+  <a href="#" onclick="ouvrirDoc('CarteVisite'); closeMenu(); return false;">Carte Visite</a>
+  <a href="#" onclick="ouvrirDoc('LettreMotivation'); closeMenu(); return false;">Lettre Motivation</a>
+  <a href="#" onclick="ouvrirDoc('CNI'); closeMenu(); return false;">CNI</a>
+  <a href="#" onclick="ouvrirDoc('ProtocoleAccord'); closeMenu(); return false;">Protocole Accord</a>
+  <a href="#" onclick="ouvrirDoc('ContratTravail'); closeMenu(); return false;">Contrat Travail</a>
+  <a href="#" onclick="ouvrirDoc('PlanLocalisation'); closeMenu(); return false;">Plan Localisation</a>
+  <a href="#" onclick="ouvrirDoc('Fiche70Noms'); closeMenu(); return false;">Fiche 70 Noms</a>
+  <a href="#" onclick="ouvrirDoc('Rapport'); closeMenu(); return false;">Rapport</a>
+  <a href="#" onclick="ouvrirDoc('GaleriePhotos'); closeMenu(); return false;">Galerie Photos</a>
+  <a href="https://module-paiement.vercel.app" target="_blank">Calendrier personnalisé</a>
+  <a href="https://secr-taire.vercel.app"_blank">calendrier sportifs</a>
+
+<a href="https://api-lime-nine-94.vercel.app/"_blank">programme inhumation</a>
+  <a
+a href="https://devislesfacilitateurs.vercel.app/"_blank">devis estimatif btp</a>
+  <a href="https://lesfacilitateurs.vercel.app" target="_blank">retour à l'accueil accueil</a>
+</div>
+
+<div class="container">
+<main class="main" id="app">
+<p>Bienvenue ✨</p>
+</main>
+</div>
+
+<script>
+
+const VIP_CODE = "233233";
+let paiementValide = false;
+
+const hamburger = document.getElementById("hamburger");
+const sideMenu = document.getElementById("sideMenu");
+
+hamburger.onclick = ()=>{
+ hamburger.classList.toggle("active");
+ sideMenu.classList.toggle("open");
+};
+
+function closeMenu(){
+ hamburger.classList.remove("active");
+ sideMenu.classList.remove("open");
+}
+
+/* ===================== DOCUMENTS ===================== */
+
+function ouvrirDoc(doc){
+const app = document.getElementById("app");
+
+app.innerHTML = `
+<h2 class="doc-title">${doc}</h2>
+
+<label>
+<input type="file" accept="image/*" style="display:none" onchange="loadImg(event,'img1')">
+<img id="img1" class="doc-photo" src="" />
+</label>
+
+<textarea style="width:100%;height:100px;">Contenu...</textarea>
+
+<canvas id="canvas" class="signature-pad"></canvas>
+
+<button class="btn btn-ghost" onclick="clearSig()">Effacer signature</button>
+<button class="btn btn-primary" onclick="download('${doc}')">Télécharger PDF</button>
+`;
+
+window.signaturePad = new SignaturePad(document.getElementById("canvas"));
+}
+
+/* ===================== IMAGE ===================== */
+
+function loadImg(e,id){
+const file = e.target.files[0];
+const img = document.getElementById(id);
+
+if(file){
+const reader = new FileReader();
+reader.onload = ev=> img.src = ev.target.result;
+reader.readAsDataURL(file);
+}
+}
+
+/* ===================== SIGNATURE ===================== */
+
+function clearSig(){
+if(window.signaturePad) window.signaturePad.clear();
+}
+
+/* ===================== DOWNLOAD ===================== */
+
+async function download(name){
+
+let code = prompt("Entrez le code VIP pour télécharger :");
+
+if(code !== VIP_CODE){
+alert("Code incorrect ❌");
+return;
+}
+
+const app = document.getElementById("app");
+
+const canvas = await html2canvas(app,{scale:2});
+const { jsPDF } = window.jspdf;
+
+const pdf = new jsPDF("p","mm","a6");
+
+pdf.addImage(canvas.toDataURL("image/png"),"PNG",0,0,105,148);
+pdf.save(name+".pdf");
+}
+
+</script>
+
+<script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/signature_pad@4.1.4/dist/signature_pad.umd.min.js"></script>
+
+</body>
+  </html>
